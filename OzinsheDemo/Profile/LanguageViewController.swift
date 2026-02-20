@@ -1,9 +1,10 @@
 import UIKit
 
-class ProfileViewController: UIViewController {
+class LanguageViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-
+    
+    
 }

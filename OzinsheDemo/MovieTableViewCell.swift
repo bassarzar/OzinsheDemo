@@ -3,11 +3,12 @@ import SnapKit
 
 class MovieTableViewCell: UITableViewCell {
 
+    
     lazy var posterImageView =
     {
         let imageView = UIImageView()
         
-        imageView.image = UIImage(named: "Image")
+        imageView.image = UIImage(named: "FavoritePoster")
         imageView.contentMode = .scaleAspectFit
         imageView.layer.cornerRadius = 8
         imageView.clipsToBounds = true
@@ -71,7 +72,7 @@ class MovieTableViewCell: UITableViewCell {
         return view
     }()
     
-    lazy var bottomView =
+    lazy var lineView =
     {
         let view = UIView()
         
@@ -94,11 +95,10 @@ class MovieTableViewCell: UITableViewCell {
     
     
     func setupUI() {
-        contentView.addSubview(posterImageView)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(subTitleLabel)
-        contentView.addSubview(playView)
-        contentView.addSubview(bottomView)
+        [posterImageView, titleLabel, subTitleLabel, playView, lineView].forEach {
+            contentView.addSubview($0)
+        }
+        
         
         posterImageView.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(24)
@@ -124,7 +124,7 @@ class MovieTableViewCell: UITableViewCell {
             make.left.equalTo(posterImageView.snp.right).offset(17)
         }
         
-        bottomView.snp.makeConstraints { make in
+        lineView.snp.makeConstraints { make in
             make.height.equalTo(1)
             make.left.equalToSuperview().inset(24)
             make.right.equalToSuperview().inset(24)

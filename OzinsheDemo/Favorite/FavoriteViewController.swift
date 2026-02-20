@@ -3,11 +3,14 @@ import UIKit
 class FavoriteViewController: UITableViewController {
 
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = UIColor(named: "F9FAFB")
+        
         tableView.separatorStyle = .none
+        navigationItem.title = "Favorites"
+        
     }
     
     
