@@ -9,14 +9,13 @@ class FavoriteViewController: UITableViewController {
         view.backgroundColor = UIColor(named: "F9FAFB")
         
         tableView.separatorStyle = .none
-        navigationItem.title = "Favorites"
-        
+        navigationItem.title = "Тізім"
     }
     
     
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 1
     }
     
     

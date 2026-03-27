@@ -3,6 +3,7 @@ import SnapKit
 
 class MovieTableViewCell: UITableViewCell {
 
+    let identifier = "MovieTableCell"
     
     lazy var posterImageView =
     {
@@ -132,6 +133,19 @@ class MovieTableViewCell: UITableViewCell {
         }
         
     }
+    
+    
+    
+    func setData(movie: Any) {
+        
+    }
+    
+    
+    
+    
+    
+    
+    
     
 
 }

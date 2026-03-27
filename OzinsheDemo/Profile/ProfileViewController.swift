@@ -1,16 +1,59 @@
 import UIKit
 import SnapKit
 
-class ProfileViewController: UIViewController {
+class ProfileViewController: UIViewController, LanguageProtocol {
+    
+    func languageDidChanged() {
+        
+    }
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
         setupNavigationBar()
         setupUI()
     }
+    
+    
+    
+    @objc func logoutButtonTapped() {
+        let logOutVC = LogOutViewController()
+        
+        logOutVC.modalPresentationStyle = .overFullScreen
+        
+        self.present(logOutVC, animated: true , completion: nil)
+    }
+    
+    
+    
+    @objc func personalDataButtonTapped() {
+        let profileVC = EditPersonalDataViewController()
+        
+        profileVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(profileVC, animated: true)
+    }
+    
+    
+    
+    @objc func changePasswordButtonTapped() {
+        let changePasswordVC = ChangePasswordViewController()
+        
+        changePasswordVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(changePasswordVC, animated: true)
+    }
+    
+    
+    
+    @objc func languageButtonTapped() {
+        let languageVC = LanguageViewController()
+        
+        languageVC.modalPresentationStyle = .overFullScreen
+        languageVC.delegate = self
+        
+        present(languageVC, animated: true , completion: nil)
+    }
+    
     
     
     
@@ -29,15 +72,9 @@ class ProfileViewController: UIViewController {
             image: UIImage(named: "logOut"),
             style: .plain,
             target: self,
-            action: #selector(logoutTapped)
+            action: #selector(logoutButtonTapped)
         )
-        navigationItem.rightBarButtonItem?.tintColor = .systemRed
-    }
-
-
-    
-    @objc func logoutTapped() {
-        print("logout")
+        navigationItem.rightBarButtonItem?.tintColor = UIColor(named: "FF402B")
     }
 
     
@@ -45,15 +82,15 @@ class ProfileViewController: UIViewController {
     // MARK: TITLE
     
     lazy var profileImageView: UIImageView = {
-        
         let imageView = UIImageView()
+        
         imageView.image = UIImage(named: "ProfilePoster")
         
         return imageView
     }()
     
+    
     lazy var titleLabel: UILabel = {
-        
         let label = UILabel()
         
         label.text = "Менің профилім"
@@ -63,8 +100,8 @@ class ProfileViewController: UIViewController {
         return label
     }()
     
+    
     lazy var subtitleLabel: UILabel = {
-        
         let label = UILabel()
         
         label.text = "nurnazarorynbassar@gmail.com"
@@ -77,7 +114,6 @@ class ProfileViewController: UIViewController {
     
     
     lazy var backView: UIView = {
-        
         let view = UIView()
         
         view.backgroundColor = UIColor(named: "F9FAFB")
@@ -90,20 +126,19 @@ class ProfileViewController: UIViewController {
     //MARK: PERSONAL DATA
     
     lazy var personalDataButton: UIButton = {
-        
         let button = UIButton()
         
         button.setTitle("Жеке Деректер", for: .normal)
         button.setTitleColor(UIColor(named: "111827"), for: .normal)
         button.titleLabel?.font = UIFont(name: "SFProDisplay-Bold", size: 16)
         button.contentHorizontalAlignment = .left
+        button.addTarget(self, action: #selector(personalDataButtonTapped), for: .touchUpInside)
         
         return button
     }()
     
     
     lazy var personalDataLabel: UILabel = {
-        
         let label = UILabel()
         
         label.text = "Өңдеу"
@@ -116,13 +151,14 @@ class ProfileViewController: UIViewController {
     
     lazy var personalDataArrowImageView: UIImageView = {
         let imageView = UIImageView()
+        
         imageView.image = UIImage(named: "ArrowRight")
+        
         return imageView
     }()
     
     
     lazy var personalDataLineView: UIView = {
-        
         let line = UIView()
 
         line.backgroundColor = UIColor(named: "D1D5DB")
@@ -136,13 +172,13 @@ class ProfileViewController: UIViewController {
     // MARK: CHANGE PASSWORD
     
     lazy var changePasswordButton: UIButton = {
-        
         let button = UIButton()
         
         button.setTitle("Құпия сөзді өзгерту", for: .normal)
         button.setTitleColor(UIColor(named: "111827"), for: .normal)
         button.titleLabel?.font = UIFont(name: "SFProDisplay-Bold", size: 16)
         button.contentHorizontalAlignment = .left
+        button.addTarget(self, action: #selector(changePasswordButtonTapped), for: .touchUpInside)
         
         return button
     }()
@@ -150,13 +186,14 @@ class ProfileViewController: UIViewController {
     
     lazy var changePasswordArrowImageView: UIImageView = {
         let imageView = UIImageView()
+        
         imageView.image = UIImage(named: "ArrowRight")
+        
         return imageView
     }()
     
     
     lazy var changePasswordLineView: UIView = {
-        
         let line = UIView()
 
         line.backgroundColor = UIColor(named: "D1D5DB")
@@ -170,20 +207,19 @@ class ProfileViewController: UIViewController {
     //MARK: LANGUAGE
     
     lazy var languageButton: UIButton = {
-       
         let button = UIButton()
         
         button.setTitle("Тіл", for: .normal)
         button.setTitleColor(UIColor(named: "111827"), for: .normal)
         button.titleLabel?.font = UIFont(name: "SFProDisplay-Bold", size: 16)
         button.contentHorizontalAlignment = .left
+        button.addTarget(self, action: #selector(languageButtonTapped), for: .touchUpInside)
         
         return button
     }()
     
     
     lazy var languageLabel: UILabel = {
-        
         let label = UILabel()
         
         label.text = "Қазақша"
@@ -196,13 +232,14 @@ class ProfileViewController: UIViewController {
     
     lazy var languageArrowImageView: UIImageView = {
         let imageView = UIImageView()
+        
         imageView.image = UIImage(named: "ArrowRight")
+        
         return imageView
     }()
     
     
     lazy var languageLineView: UIView = {
-        
         let line = UIView()
 
         line.backgroundColor = UIColor(named: "D1D5DB")
@@ -216,21 +253,20 @@ class ProfileViewController: UIViewController {
     // MARK: SWITCH MODE
     
     lazy var darkModeLabel: UILabel = {
-        
         let label = UILabel()
         
         label.text = "Қараңғы режим"
         label.textColor = UIColor(named: "111827")
         label.font = UIFont(name: "SFProDisplay-SemiBold", size: 16)
+        
         return label
     }()
     
     lazy var darkModeSwitch: UISwitch = {
         let dMSwitch = UISwitch()
 
-        dMSwitch.onTintColor = UIColor(red: 0.702, green: 0.463, blue: 0.969, alpha: 1)
-        dMSwitch.thumbTintColor = UIColor(red: 0.9, green: 0.91, blue: 0.92, alpha: 1)
-
+        dMSwitch.onTintColor = UIColor(named: "B376F7")
+        dMSwitch.thumbTintColor = UIColor(named: "E5E7EB")
         dMSwitch.addTarget(self, action: #selector(switcher(_:)), for: .valueChanged)
 
         return dMSwitch
@@ -239,6 +275,7 @@ class ProfileViewController: UIViewController {
     
     @objc func switcher(_ dmswitch: UISwitch) {
         if dmswitch.isOn {
+            
             if let windowScene = UIApplication.shared.connectedScenes
                 .compactMap({ $0 as? UIWindowScene })
                 .first(where: { $0.activationState == .foregroundActive }) {
@@ -248,6 +285,7 @@ class ProfileViewController: UIViewController {
                 }
             }
         } else {
+            
             if let windowScene = UIApplication.shared.connectedScenes
                 .compactMap({ $0 as? UIWindowScene })
                 .first(where: { $0.activationState == .foregroundActive }) {
@@ -261,7 +299,7 @@ class ProfileViewController: UIViewController {
     
     
     
-    // IMPLEMENTATION
+    // MARK: IMPLEMENTATION
     
     func setupUI() {
         
@@ -287,15 +325,13 @@ class ProfileViewController: UIViewController {
             make.centerX.equalToSuperview()
         }
         
-        
-        
         backView.snp.makeConstraints { (make) in
             make.top.equalTo(subtitleLabel.snp.bottom).offset(24)
             make.left.right.bottom.equalToSuperview()
         }
         
         
-        
+        // Personal Data
         
         personalDataButton.snp.makeConstraints { (make) in
             make.top.equalToSuperview().inset(24)
@@ -322,7 +358,7 @@ class ProfileViewController: UIViewController {
         }
         
         
-        
+        // Password
         
         changePasswordButton.snp.makeConstraints { (make) in
             make.top.equalTo(personalDataLineView).offset(1)
@@ -344,7 +380,7 @@ class ProfileViewController: UIViewController {
         }
         
         
-        
+        // Language
         
         languageButton.snp.makeConstraints { (make) in
             make.top.equalTo(changePasswordLineView).offset(1)
@@ -371,7 +407,7 @@ class ProfileViewController: UIViewController {
         }
         
         
-        
+        // Switcher
         
         darkModeLabel.snp.makeConstraints { (make) in
             make.top.equalTo(languageLineView).offset(24)
