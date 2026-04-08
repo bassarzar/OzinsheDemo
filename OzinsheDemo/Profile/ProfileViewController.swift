@@ -8,6 +8,12 @@ class ProfileViewController: UIViewController, LanguageProtocol {
     }
     
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tabBarController?.tabBar.isHidden = false
+    }
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -30,7 +36,7 @@ class ProfileViewController: UIViewController, LanguageProtocol {
     @objc func personalDataButtonTapped() {
         let profileVC = EditPersonalDataViewController()
         
-        profileVC.hidesBottomBarWhenPushed = true
+        tabBarController?.tabBar.isHidden = true
         navigationController?.pushViewController(profileVC, animated: true)
     }
     
@@ -39,7 +45,7 @@ class ProfileViewController: UIViewController, LanguageProtocol {
     @objc func changePasswordButtonTapped() {
         let changePasswordVC = ChangePasswordViewController()
         
-        changePasswordVC.hidesBottomBarWhenPushed = true
+        tabBarController?.tabBar.isHidden = true
         navigationController?.pushViewController(changePasswordVC, animated: true)
     }
     
@@ -110,7 +116,6 @@ class ProfileViewController: UIViewController, LanguageProtocol {
         
         return label
     }()
-    
     
     
     lazy var backView: UIView = {

@@ -30,6 +30,7 @@ class LeftAlignedCollectionViewFlowLayout: UICollectionViewFlowLayout {
     
 }
 
+
 class SearchViewController: UIViewController {
 
     var isLoading: Bool = false
@@ -59,7 +60,6 @@ class SearchViewController: UIViewController {
     }
     
     
-
 
     lazy var searchTextField: TextFieldWithPadding = {
         let searchTF = TextFieldWithPadding()
@@ -144,27 +144,31 @@ class SearchViewController: UIViewController {
     }()
 
     
-    
 
     func hideKeyboardWhenTappedAround() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
     }
+    
 
     @objc func dismissKeyboard() {
         view.endEditing(true)
     }
+    
 
     @objc func clearTextField() {
         searchTextField.text = ""
         downloadSearchMovies()
     }
 
+    
     @objc func searchButtonTapped() {
         downloadSearchMovies()
     }
+    
 
+    
     func downloadCategories() {
         categories = [
             Category(id: 1, name: "Телехикая"),
@@ -180,6 +184,7 @@ class SearchViewController: UIViewController {
         ]
         collectionView.reloadData()
     }
+    
 
     func addViews() {
         view.backgroundColor = UIColor(named: "111827D")
@@ -223,7 +228,6 @@ class SearchViewController: UIViewController {
         }
         
     }
-    
     
     
     
