@@ -3,11 +3,10 @@ import SnapKit
 
 final class OnboardingViewController: UIViewController {
 
-    // MARK: - Data
+    // MARK: - Properties
 
     private var slides: [OnboardingSlide] = []
     private var currentPage = 0
-
     private let buttonGradient = CAGradientLayer()
 
     // MARK: - UI
@@ -16,26 +15,28 @@ final class OnboardingViewController: UIViewController {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 0
-
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.isPagingEnabled = true
         cv.showsHorizontalScrollIndicator = false
+        cv.bounces = false
         cv.delegate = self
         cv.dataSource = self
-        cv.register(OnboardingCollectionViewCell.self,
-                    forCellWithReuseIdentifier: OnboardingCollectionViewCell.identifier)
+        cv.register(
+            OnboardingCollectionViewCell.self,
+            forCellWithReuseIdentifier: OnboardingCollectionViewCell.identifier
+        )
         return cv
     }()
 
-    private let pageControl: UIPageControl = {
-        let pc = UIPageControl()
-        pc.currentPageIndicatorTintColor = UIColor(named: "7C3AED")
-        pc.pageIndicatorTintColor = UIColor.lightGray.withAlphaComponent(0.5)
+    private lazy var pageControl: CustomPageControl = {
+        let pc = CustomPageControl()
+        pc.numberOfPages = 3
+        pc.currentPage = 0
         return pc
     }()
 
-    private let nextButton: UIButton = {
-        let btn = UIButton()
+    private lazy var nextButton: UIButton = {
+        let btn = UIButton(type: .custom)
         btn.setTitle("Әрі қарай", for: .normal)
         btn.titleLabel?.font = .boldSystemFont(ofSize: 18)
         btn.setTitleColor(.white, for: .normal)
@@ -45,13 +46,15 @@ final class OnboardingViewController: UIViewController {
         return btn
     }()
 
-    private let skipButton: UIButton = {
-        let btn = UIButton(type: .system)
+    private lazy var skipButton: UIButton = {
+        let btn = UIButton(type: .custom)
         btn.setTitle("Өткізу", for: .normal)
-        btn.setTitleColor(UIColor(named: "111827"), for: .normal)
-        btn.backgroundColor = UIColor(named: "F3F4F6")
+        btn.setTitleColor(.white, for: .normal)
         btn.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
+        btn.backgroundColor = UIColor.white.withAlphaComponent(0.25)
         btn.layer.cornerRadius = 8
+        btn.layer.borderWidth = 1
+        btn.layer.borderColor = UIColor.white.withAlphaComponent(0.4).cgColor
         btn.contentEdgeInsets = UIEdgeInsets(top: 8, left: 14, bottom: 8, right: 14)
         return btn
     }()
@@ -60,11 +63,11 @@ final class OnboardingViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        setupSlides()
         setupUI()
-        setupGradient()
+        setupSlides()
+        setupGradientButton()
         setupActions()
+        updateUI(animated: false)
     }
 
     override func viewDidLayoutSubviews() {
@@ -84,16 +87,15 @@ final class OnboardingViewController: UIViewController {
             OnboardingSlide(
                 image: "secondImage",
                 title: "ÖZINŞE-ге қош келдің!",
-                subtitle: "Кез келген құрылғыдан қара Сүйікті фильміңді қосымша төлемсіз телефоннан, планшеттен, ноутбуктан қара"
+                subtitle: "Кез келген құрылғыдан қара. Сүйікті фильмді қосымша төлемсіз телефоннан, планшеттен, ноутбуктан қара"
             ),
             OnboardingSlide(
                 image: "thirdImage",
                 title: "ÖZINŞE-ге қош келдің!",
-                subtitle: "Тіркелу оңай. Қазір тіркел де, қалаған фильміңе қол жеткіз"
+                subtitle: "Тіркелу оңай. Қазір тіркел де қалаған фильміңе қол жеткіз"
             )
         ]
-
-        pageControl.numberOfPages = slides.count
+        collectionView.reloadData()
     }
 
     private func setupUI() {
@@ -108,6 +110,11 @@ final class OnboardingViewController: UIViewController {
             $0.edges.equalToSuperview()
         }
 
+        skipButton.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(12)
+            $0.right.equalToSuperview().inset(16)
+        }
+
         nextButton.snp.makeConstraints {
             $0.left.right.equalToSuperview().inset(24)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(24)
@@ -115,24 +122,19 @@ final class OnboardingViewController: UIViewController {
         }
 
         pageControl.snp.makeConstraints {
-            $0.bottom.equalTo(nextButton.snp.top).offset(-16)
+            $0.bottom.equalTo(nextButton.snp.top).offset(-20)
             $0.centerX.equalToSuperview()
-        }
-
-        skipButton.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(12)
-            $0.right.equalToSuperview().inset(16)
+            $0.height.equalTo(8)
         }
     }
 
-    private func setupGradient() {
+    private func setupGradientButton() {
         buttonGradient.colors = [
-            UIColor(named: "7E2DFC")!.cgColor,
-            UIColor(named: "B376F7")!.cgColor
+            UIColor(named: "7E2DFC")?.cgColor ?? UIColor.purple.cgColor,
+            UIColor(named: "B376F7")?.cgColor ?? UIColor.systemPurple.cgColor
         ]
         buttonGradient.startPoint = CGPoint(x: 0, y: 0.5)
-        buttonGradient.endPoint = CGPoint(x: 1, y: 0.5)
-
+        buttonGradient.endPoint   = CGPoint(x: 1, y: 0.5)
         nextButton.layer.insertSublayer(buttonGradient, at: 0)
     }
 
@@ -146,22 +148,16 @@ final class OnboardingViewController: UIViewController {
     @objc private func nextTapped() {
         if currentPage < slides.count - 1 {
             currentPage += 1
-
             collectionView.scrollToItem(
                 at: IndexPath(item: currentPage, section: 0),
                 at: .centeredHorizontally,
                 animated: true
             )
-
             pageControl.currentPage = currentPage
-            pageControl.currentPageIndicatorTintColor = UIColor(named: "B376F7")
-            pageControl.pageIndicatorTintColor = UIColor.lightGray.withAlphaComponent(0.3)
-            
+            updateUI(animated: true)
         } else {
             finishOnboarding()
         }
-
-        updateUI()
     }
 
     @objc private func skipTapped() {
@@ -171,26 +167,35 @@ final class OnboardingViewController: UIViewController {
     private func finishOnboarding() {
         UserDefaults.standard.set(true, forKey: "seenOnboarding")
 
-        let vc = TabBarViewController()
-        vc.modalPresentationStyle = .fullScreen
-        present(vc, animated: true)
+        let loginVC = LoginViewController()
+        let nav = UINavigationController(rootViewController: loginVC)
+        nav.setNavigationBarHidden(true, animated: false)
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
     }
 
-    private func updateUI() {
-        let isLast = currentPage == slides.count - 1
+    // MARK: - State
 
-        UIView.animate(withDuration: 0.25) {
-            self.nextButton.alpha = isLast ? 1 : 0
-            self.skipButton.alpha = isLast ? 0 : 1
+    private func updateUI(animated: Bool) {
+        let isLast = currentPage == slides.count - 1
+        let nextAlpha: CGFloat = isLast ? 1 : 0
+        let skipAlpha: CGFloat = isLast ? 0 : 1
+
+        if animated {
+            UIView.animate(withDuration: 0.25) {
+                self.nextButton.alpha = nextAlpha
+                self.skipButton.alpha = skipAlpha
+            }
+        } else {
+            nextButton.alpha = nextAlpha
+            skipButton.alpha = skipAlpha
         }
     }
 }
 
-// MARK: - Collection
+// MARK: - UICollectionViewDataSource
 
-extension OnboardingViewController: UICollectionViewDelegate,
-                                    UICollectionViewDataSource,
-                                    UICollectionViewDelegateFlowLayout {
+extension OnboardingViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
@@ -199,27 +204,37 @@ extension OnboardingViewController: UICollectionViewDelegate,
 
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-
-        let cell = collectionView.dequeueReusableCell(
+        guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: OnboardingCollectionViewCell.identifier,
             for: indexPath
-        ) as! OnboardingCollectionViewCell
-
+        ) as? OnboardingCollectionViewCell else {
+            return UICollectionViewCell()
+        }
         cell.configure(with: slides[indexPath.item])
         return cell
     }
+}
+
+// MARK: - UICollectionViewDelegateFlowLayout
+
+extension OnboardingViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-
-        return CGSize(width: view.frame.width,
-                      height: view.frame.height)
+        view.bounds.size
     }
+}
+
+// MARK: - UIScrollViewDelegate
+
+extension OnboardingViewController: UIScrollViewDelegate {
 
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        currentPage = Int(scrollView.contentOffset.x / view.frame.width)
+        let page = Int(scrollView.contentOffset.x / scrollView.frame.width)
+        guard page != currentPage else { return }
+        currentPage = page
         pageControl.currentPage = currentPage
-        updateUI()
+        updateUI(animated: true)
     }
 }

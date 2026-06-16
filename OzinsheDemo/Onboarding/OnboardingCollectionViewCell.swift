@@ -7,13 +7,51 @@ final class OnboardingCollectionViewCell: UICollectionViewCell {
 
     // MARK: - UI
 
-    private let imageView = UIImageView()
+    private let imageView: UIImageView = {
+        let iv = UIImageView()
+        iv.contentMode = .scaleAspectFill
+        iv.clipsToBounds = true
+        return iv
+    }()
+
     private let gradientView = UIView()
 
-    private let titleLabel = UILabel()
-    private let subtitleLabel = UILabel()
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 24)
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.textColor = UIColor(named: "111827")
+        return label
+    }()
 
-    private let textStack = UIStackView()
+    private let subtitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 15, weight: .regular)
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.textColor = UIColor(named: "6B7280")
+        return label
+    }()
+
+    private let textStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 12
+        stack.alignment = .fill
+        return stack
+    }()
+
+    private let gradientLayer: CAGradientLayer = {
+        let layer = CAGradientLayer()
+        layer.colors = [
+            UIColor.white.withAlphaComponent(0).cgColor,
+            UIColor.white.withAlphaComponent(0.85).cgColor,
+            UIColor.white.cgColor
+        ]
+        layer.locations = [0.0, 0.65, 1.0]
+        return layer
+    }()
 
     // MARK: - Init
 
@@ -23,30 +61,13 @@ final class OnboardingCollectionViewCell: UICollectionViewCell {
     }
 
     required init?(coder: NSCoder) {
-        fatalError()
+        fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: - Setup
 
     private func setupUI() {
         backgroundColor = .white
-
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-
-        titleLabel.font = .boldSystemFont(ofSize: 24)
-        titleLabel.textAlignment = .center
-        titleLabel.numberOfLines = 0
-        titleLabel.textColor = UIColor(named: "111827") ?? .black
-
-        subtitleLabel.font = .systemFont(ofSize: 15)
-        subtitleLabel.textAlignment = .center
-        subtitleLabel.numberOfLines = 0
-        subtitleLabel.textColor = UIColor(named: "6B7280") ?? .gray
-
-        textStack.axis = .vertical
-        textStack.spacing = 12
-        textStack.alignment = .fill
 
         textStack.addArrangedSubview(titleLabel)
         textStack.addArrangedSubview(subtitleLabel)
@@ -55,45 +76,32 @@ final class OnboardingCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(gradientView)
         contentView.addSubview(textStack)
 
-        setupConstraints()
-        setupGradient()
-    }
+        gradientView.layer.addSublayer(gradientLayer)
 
-    private func setupConstraints() {
         imageView.snp.makeConstraints {
             $0.top.left.right.equalToSuperview()
-            $0.height.equalToSuperview().multipliedBy(0.7)
+            $0.height.equalToSuperview().multipliedBy(0.6)
         }
 
         gradientView.snp.makeConstraints {
             $0.left.right.bottom.equalTo(imageView)
-            $0.height.equalTo(180)
+            $0.height.equalTo(200)
         }
 
         textStack.snp.makeConstraints {
-            $0.top.equalTo(imageView.snp.bottom).offset(24)
+            $0.top.equalTo(imageView.snp.bottom).offset(20)
             $0.left.right.equalToSuperview().inset(24)
         }
     }
 
-    private func setupGradient() {
-        let gradient = CAGradientLayer()
-        gradient.colors = [
-            UIColor.clear.cgColor,
-            UIColor.white.withAlphaComponent(0.9).cgColor,
-            UIColor.white.cgColor
-        ]
-        gradient.locations = [0.0, 0.7, 1.0]
-
-        gradientView.layer.addSublayer(gradient)
-    }
+    // MARK: - Layout
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        gradientView.layer.sublayers?.first?.frame = gradientView.bounds
+        gradientLayer.frame = gradientView.bounds
     }
 
-    // MARK: - Config
+    // MARK: - Configure
 
     func configure(with slide: OnboardingSlide) {
         imageView.image = UIImage(named: slide.image)
