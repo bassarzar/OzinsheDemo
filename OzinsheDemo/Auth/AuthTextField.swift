@@ -7,131 +7,169 @@ enum AuthTextFieldType {
     case confirmPassword
 }
 
-final class AuthTextField: UIView {
-
+class AuthTextField: UIView {
+    
     // MARK: - Public
-
+    
     var text: String { textField.text ?? "" }
     var onTextChanged: ((String) -> Void)?
-
+    
     var isError: Bool = false {
         didSet { updateAppearance() }
     }
-
+    
     var errorMessage: String? {
         didSet { errorLabel.text = errorMessage }
     }
-
-    // MARK: - UI
-
-    private let containerView = UIView()
-    private let iconImageView = UIImageView()
-    private let textField = UITextField()
-    private let eyeButton = UIButton(type: .custom)
-    private let errorLabel = UILabel()
-
+    
+    
+    // MARK: - Properties
+    
     private let fieldType: AuthTextFieldType
     private var isPasswordVisible = false
-
+    
+    
+    // MARK: - UI
+    
+    lazy var containerView: UIView =
+    {
+        let view = UIView()
+        
+        view.backgroundColor = UIColor(named: "F3F4F6")
+        view.layer.cornerRadius = 12
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor.clear.cgColor
+        
+        return view
+    }()
+    
+    lazy var iconImageView: UIImageView =
+    {
+        let imageView = UIImageView()
+        
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = UIColor(named: "9CA3AF")
+        
+        return imageView
+    }()
+    
+    lazy var textField: UITextField =
+    {
+        let tf = UITextField()
+        
+        tf.font = UIFont(name: "SFProDisplay-Regular", size: 15)
+        tf.textColor = UIColor(named: "111827")
+        tf.autocorrectionType = .no
+        tf.autocapitalizationType = .none
+        
+        return tf
+    }()
+    
+    lazy var eyeButton: UIButton =
+    {
+        let button = UIButton(type: .custom)
+        
+        button.setImage(UIImage(named: "showPassword"), for: .normal)
+        button.tintColor = UIColor(named: "9CA3AF")
+        
+        return button
+    }()
+    
+    lazy var errorLabel: UILabel =
+    {
+        let label = UILabel()
+        
+        label.font = UIFont(name: "SFProDisplay-Regular", size: 12)
+        label.textColor = UIColor(named: "FF402B")
+        label.isHidden = true
+        
+        return label
+    }()
+    
+    
     // MARK: - Init
-
+    
     init(type: AuthTextFieldType, placeholder: String) {
         self.fieldType = type
         super.init(frame: .zero)
+        
         setupUI(placeholder: placeholder)
     }
-
-    required init?(coder: NSCoder) { fatalError() }
-
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
     // MARK: - Setup
-
-    private func setupUI(placeholder: String) {
+    
+    func setupUI(placeholder: String) {
         addSubviews(containerView, errorLabel)
-
-        containerView.backgroundColor = UIColor(named: "F3F4F6")
-        containerView.layer.cornerRadius = 12
-        containerView.layer.borderWidth = 1
-        containerView.layer.borderColor = UIColor.clear.cgColor
-        containerView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
-            $0.height.equalTo(52)
-        }
-
-        containerView.addSubview(iconImageView)
-        iconImageView.contentMode = .scaleAspectFit
-        iconImageView.tintColor = UIColor(named: "9CA3AF")
-
-        switch fieldType {
-        case .email:
-            iconImageView.image = UIImage(systemName: "envelope")
-        case .password, .confirmPassword:
-            iconImageView.image = UIImage(systemName: "lock")
-        }
-
-        iconImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(14)
-            $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(18)
-        }
-
-        containerView.addSubview(textField)
-        textField.font = UIFont(name: "SFProDisplay-Regular", size: 15) ?? .systemFont(ofSize: 15)
-        textField.textColor = UIColor(named: "111827")
-        textField.autocorrectionType = .no
-        textField.autocapitalizationType = .none
+        containerView.addSubviews(iconImageView, textField)
+        
         textField.attributedPlaceholder = NSAttributedString(
             string: placeholder,
             attributes: [.foregroundColor: UIColor(named: "9CA3AF") ?? .lightGray]
         )
         textField.delegate = self
         textField.addTarget(self, action: #selector(textDidChange), for: .editingChanged)
-
-        if fieldType == .email {
+        
+        switch fieldType {
+        case .email:
+            iconImageView.image = UIImage(named: "message")
             textField.keyboardType = .emailAddress
-        }
-        if fieldType == .password || fieldType == .confirmPassword {
+        case .password, .confirmPassword:
+            iconImageView.image = UIImage(named: "password")
             textField.isSecureTextEntry = true
-        }
-
-        if fieldType == .password || fieldType == .confirmPassword {
             containerView.addSubview(eyeButton)
-            eyeButton.setImage(UIImage(systemName: "eye"), for: .normal)
-            eyeButton.tintColor = UIColor(named: "9CA3AF")
             eyeButton.addTarget(self, action: #selector(togglePassword), for: .touchUpInside)
-            eyeButton.snp.makeConstraints {
-                $0.trailing.equalToSuperview().inset(14)
-                $0.centerY.equalToSuperview()
-                $0.width.height.equalTo(24)
+        }
+        
+        containerView.snp.makeConstraints { make in
+            make.top.left.right.equalToSuperview()
+            make.height.equalTo(52)
+        }
+        
+        iconImageView.snp.makeConstraints { make in
+            make.left.equalToSuperview().inset(14)
+            make.centerY.equalToSuperview()
+            make.width.height.equalTo(18)
+        }
+        
+        if fieldType == .password || fieldType == .confirmPassword {
+            eyeButton.snp.makeConstraints { make in
+                make.right.equalToSuperview().inset(14)
+                make.centerY.equalToSuperview()
+                make.width.height.equalTo(24)
             }
-            textField.snp.makeConstraints {
-                $0.leading.equalTo(iconImageView.snp.trailing).offset(10)
-                $0.trailing.equalTo(eyeButton.snp.leading).offset(-6)
-                $0.centerY.equalToSuperview()
+            
+            textField.snp.makeConstraints { make in
+                make.left.equalTo(iconImageView.snp.right).offset(10)
+                make.right.equalTo(eyeButton.snp.left).offset(-6)
+                make.centerY.equalToSuperview()
             }
         } else {
-            textField.snp.makeConstraints {
-                $0.leading.equalTo(iconImageView.snp.trailing).offset(10)
-                $0.trailing.equalToSuperview().inset(14)
-                $0.centerY.equalToSuperview()
+            textField.snp.makeConstraints { make in
+                make.left.equalTo(iconImageView.snp.right).offset(10)
+                make.right.equalToSuperview().inset(14)
+                make.centerY.equalToSuperview()
             }
         }
-
-        errorLabel.font = UIFont(name: "SFProDisplay-Regular", size: 12) ?? .systemFont(ofSize: 12)
-        errorLabel.textColor = UIColor(named: "FF402B")
-        errorLabel.isHidden = true
-        errorLabel.snp.makeConstraints {
-            $0.top.equalTo(containerView.snp.bottom).offset(4)
-            $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview()
+        
+        errorLabel.snp.makeConstraints { make in
+            make.top.equalTo(containerView.snp.bottom).offset(4)
+            make.left.right.equalToSuperview()
+            make.bottom.equalToSuperview()
         }
     }
-
+    
+    
     // MARK: - Appearance
-
+    
     private func updateAppearance() {
         if isError {
             containerView.layer.borderColor = UIColor(named: "FF402B")?.cgColor
-            containerView.backgroundColor = UIColor(named: "FF402B")?.withAlphaComponent(0.05)
+            containerView.backgroundColor = UIColor(named: "FF402B")?.withAlphaComponent(0.08)
             errorLabel.isHidden = false
         } else {
             containerView.layer.borderColor = UIColor.clear.cgColor
@@ -139,9 +177,10 @@ final class AuthTextField: UIView {
             errorLabel.isHidden = true
         }
     }
-
-    func setFocused(_ focused: Bool) {
+    
+    private func setFocused(_ focused: Bool) {
         guard !isError else { return }
+        
         if focused {
             containerView.layer.borderColor = UIColor(named: "7E2DFC")?.cgColor
             containerView.layer.borderWidth = 1.5
@@ -152,26 +191,36 @@ final class AuthTextField: UIView {
             containerView.backgroundColor = UIColor(named: "F3F4F6")
         }
     }
-
+    
+    
     // MARK: - Actions
-
-    @objc private func togglePassword() {
+    
+    @objc func togglePassword() {
         isPasswordVisible.toggle()
         textField.isSecureTextEntry = !isPasswordVisible
-        let icon = isPasswordVisible ? "eye.slash" : "eye"
-        eyeButton.setImage(UIImage(systemName: icon), for: .normal)
+        
+        let icon = isPasswordVisible ? "removeButton" : "showPassword"
+        eyeButton.setImage(UIImage(named: icon), for: .normal)
     }
-
-    @objc private func textDidChange() {
+    
+    @objc func textDidChange() {
         onTextChanged?(textField.text ?? "")
     }
 }
 
+
 // MARK: - UITextFieldDelegate
 
 extension AuthTextField: UITextFieldDelegate {
-    func textFieldDidBeginEditing(_ textField: UITextField) { setFocused(true) }
-    func textFieldDidEndEditing(_ textField: UITextField) { setFocused(false) }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        setFocused(true)
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        setFocused(false)
+    }
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
